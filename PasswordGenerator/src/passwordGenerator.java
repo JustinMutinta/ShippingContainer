@@ -27,6 +27,8 @@ public class passwordGenerator extends JFrame {  //New class that extends JFrame
         Insets insets = getInsets();                        //To customize placement
         Dimension size;                                     //To customize size
 
+        //Set size for each object
+        //Set location and size of each object
         size = closeButton.getPreferredSize();
         closeButton.setBounds(500 + insets.left, 25 + insets.top, size.width + 10, size.height);
 
@@ -44,45 +46,47 @@ public class passwordGenerator extends JFrame {  //New class that extends JFrame
 
         closeButton.addActionListener(new ActionListener() { //Set action to when close button is closed.
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+            public void actionPerformed(ActionEvent e) {       //Function when the button is clicked
+                System.exit(0);                         //Close out the GUI
             }
         });
 
-        generateButton.addActionListener(new ActionListener() {
+        generateButton.addActionListener(new ActionListener() {    //This is when the Generate button is clicked
             @Override
-            public void actionPerformed(ActionEvent e) {
-                passwordBox.setText("");
-                generateNewPassword();
+            public void actionPerformed(ActionEvent e) {            //function for when the button is clicked.
+                passwordBox.setText("");                            //Clears out current contents
+                generateNewPassword();                              //Uses the function to generate new password
             }
         });
 
 
 
-        setVisible(true); //Make the GUI visible
+        setVisible(true);                               //Make the GUI visible
     }
 
-    public void generateNewPassword(){
-        ArrayList<String> word1 = new ArrayList<String>();
-        ArrayList<String> word2 = new ArrayList<String>();
-        int[] numberValue = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    public void generateNewPassword(){                          //Function to create new password
+        ArrayList<String> word1 = new ArrayList<String>();      //Create ArrayList for first word
+        ArrayList<String> word2 = new ArrayList<String>();      //Create ArrayList for second word
+        int[] numberValue = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};     //Create Arrays for Symbols and Numbers
         char[] symbolValue = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+'};
 
+        //Add values to ArrayLists
         word1.add("Table"); word1.add("Pen"); word1.add("Chair"); word1.add("Book"); word1.add("Read"); word1.add("Journal");
         word2.add("Knife"); word2.add("Board"); word2.add("Plate"); word2.add("Pot"); word2.add("Cup"); word2.add("Sponge");
 
+        //Create new Random object. This will be used to pull random values from the Arrays/ArrayLists
         Random randomValue = new Random();
 
-        passwordBox.setText(word1.get(randomValue.nextInt(word1.size())) +
-                            numberValue[randomValue.nextInt(numberValue.length)] +
-                            numberValue[randomValue.nextInt(numberValue.length)] +
-                            word2.get(randomValue.nextInt(word2.size())) +
-                            symbolValue[randomValue.nextInt(symbolValue.length)] +
-                            symbolValue[randomValue.nextInt(symbolValue.length)]);
+        passwordBox.setText(word1.get(randomValue.nextInt(word1.size())) +              //Assign word1
+                            numberValue[randomValue.nextInt(numberValue.length)] +      //Assign numberValue
+                            numberValue[randomValue.nextInt(numberValue.length)] +      //Assign numberValue
+                            word2.get(randomValue.nextInt(word2.size())) +              //Assign word2
+                            symbolValue[randomValue.nextInt(symbolValue.length)] +      //Assign symbol
+                            symbolValue[randomValue.nextInt(symbolValue.length)]);      //Assign symbol
     }
 
     public static void main(String[] args) {
-        new passwordGenerator();
+        new passwordGenerator(); //Run it
     }
 
 }
