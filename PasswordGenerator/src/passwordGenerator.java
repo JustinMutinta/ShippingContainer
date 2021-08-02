@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class passwordGenerator extends JFrame {  //New class that extends JFrame
 
@@ -47,7 +49,36 @@ public class passwordGenerator extends JFrame {  //New class that extends JFrame
             }
         });
 
+        generateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                passwordBox.setText("");
+                generateNewPassword();
+            }
+        });
+
+
+
         setVisible(true); //Make the GUI visible
+    }
+
+    public void generateNewPassword(){
+        ArrayList<String> word1 = new ArrayList<String>();
+        ArrayList<String> word2 = new ArrayList<String>();
+        int[] numberValue = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        char[] symbolValue = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+'};
+
+        word1.add("Table"); word1.add("Pen"); word1.add("Chair"); word1.add("Book"); word1.add("Read"); word1.add("Journal");
+        word2.add("Knife"); word2.add("Board"); word2.add("Plate"); word2.add("Pot"); word2.add("Cup"); word2.add("Sponge");
+
+        Random randomValue = new Random();
+
+        passwordBox.setText(word1.get(randomValue.nextInt(word1.size())) +
+                            numberValue[randomValue.nextInt(numberValue.length)] +
+                            numberValue[randomValue.nextInt(numberValue.length)] +
+                            word2.get(randomValue.nextInt(word2.size())) +
+                            symbolValue[randomValue.nextInt(symbolValue.length)] +
+                            symbolValue[randomValue.nextInt(symbolValue.length)]);
     }
 
     public static void main(String[] args) {
