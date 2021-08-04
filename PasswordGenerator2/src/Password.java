@@ -45,6 +45,28 @@ public class Password extends JFrame {
             }
         });
 
+        generateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              //  passwordBox.setText((String) passwordComboBox.getSelectedItem());
+                String temporaryOption = (String) passwordComboBox.getSelectedItem();
+                switch (temporaryOption){
+                    case "Level 1":
+                        passwordBox.setText(createPassword(1));
+                        break;
+                    case "Level 2":
+                        passwordBox.setText(createPassword(2));
+                        break;
+                    case "Level 3":
+                        passwordBox.setText(createPassword(3));
+                        break;
+                    default:
+                        passwordBox.setText(createPassword(4));
+                        break;
+                }
+            }
+        });
+
 
         add(passwordPanel);
         setVisible(true);
@@ -77,13 +99,11 @@ public class Password extends JFrame {
                 return word1[randomValue.nextInt(word1.length)] +
                         numberValue[randomValue.nextInt(numberValue.length)] +
                         numberValue[randomValue.nextInt(numberValue.length)] +
-                        word2[randomValue.nextInt(word2.length)] +
-                        symbolValue[randomValue.nextInt(symbolValue.length)];
+                        word2[randomValue.nextInt(word2.length)];
             case 2:
                 return word1[randomValue.nextInt(word1.length)] +
                         numberValue[randomValue.nextInt(numberValue.length)] +
-                        numberValue[randomValue.nextInt(numberValue.length)] +
-                        word2[randomValue.nextInt(word2.length)];
+                        numberValue[randomValue.nextInt(numberValue.length)];
             default:
                 return word1[randomValue.nextInt(word1.length)];
         }
