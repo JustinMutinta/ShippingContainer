@@ -8,7 +8,7 @@ public class AddRemoveWindow extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);  //closes this window without closing the others
 
         JPanel addRemovePanel = new JPanel();
-        
+
 
         JTextArea textAreaLeft = new JTextArea("Left");
         JTextArea textAreaRight = new JTextArea("Right");
