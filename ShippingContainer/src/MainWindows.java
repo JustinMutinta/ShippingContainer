@@ -2,12 +2,13 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainWindows extends JFrame {
+public class MainWindows extends JFrame {  //main window
+
     public MainWindows(){
         setSize(200,200);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JButton addRemoveButton = new JButton("Add/Remove");
+        JButton addRemoveButton = new JButton("Add/Remove");  //To Add/Remove Window
         addRemoveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -15,7 +16,7 @@ public class MainWindows extends JFrame {
             }
         });
 
-        JButton viewContButton = new JButton("View Contents");
+        JButton viewContButton = new JButton("View Contents");  //To View ContentWindow
         viewContButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -23,7 +24,7 @@ public class MainWindows extends JFrame {
             }
         });
 
-        JButton closeButton = new JButton("Close");
+        JButton closeButton = new JButton("Close");         //To close the window
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

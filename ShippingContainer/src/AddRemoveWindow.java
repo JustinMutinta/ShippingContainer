@@ -12,8 +12,8 @@ public class AddRemoveWindow extends JFrame {
         addRemovePanel.setLayout(null);
 
 
-        JTextArea textAreaLeft = new JTextArea("Left");
-        JTextArea textAreaRight = new JTextArea("Right");
+        JTextArea textAreaLeft = new JTextArea("Left");   //Display text area on the left
+        JTextArea textAreaRight = new JTextArea("Right"); //Display text area on the right
 
         JButton addButton = new JButton("Add >>");
         JButton removeButton = new JButton("Remove <<");

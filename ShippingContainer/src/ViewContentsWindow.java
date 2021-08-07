@@ -10,7 +10,7 @@ public class ViewContentsWindow extends JFrame {
 
         JTextArea viewContentsBox = new JTextArea();
 
-        JPanel viewPanel = new JPanel();
+        JPanel viewPanel = new JPanel(); //Panel to hold objects
         viewPanel.setLayout(null);
 
         Insets insets = getInsets();

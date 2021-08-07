@@ -1,4 +1,4 @@
-public class Container{
+public class Container{ //Class to create objects
     int height;
     int width;
     int length;
@@ -6,7 +6,7 @@ public class Container{
     String description;
     String serialNumber;
 
-    public Container(String description, String serialNumber){  //20 foot container
+    public Container(String description, String serialNumber){  //20 foot container objects
         this.height = 10;
         this.width = 10;
         this.length = 20;
@@ -15,7 +15,7 @@ public class Container{
         this.serialNumber = serialNumber;
     }
 
-    public Container(String description){
+    public Container(String description){  //function to create object
         this.height = 10;
         this.width = 10;
         this.length = 10;
@@ -24,6 +24,7 @@ public class Container{
         serialNumber = "No Serial number";
     }
 
+    //create a more custom object
     public Container(int height, int width, int length, int weight,String description, String serialNumber){
         this.height = height;
         this.width = width;
