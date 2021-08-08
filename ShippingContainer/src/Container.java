@@ -6,6 +6,10 @@ public class Container{ //Class to create objects
     String description;
     String serialNumber;
 
+    public Container(){
+
+    }
+
     public Container(String description, String serialNumber){  //20 foot container objects
         this.height = 10;
         this.width = 10;

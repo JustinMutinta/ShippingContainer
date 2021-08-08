@@ -2,8 +2,37 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class AddRemoveWindow extends JFrame {
+    Container[] shipContainer = new Container[5];
+    Container[] container1 = new Container[5];
+    Container[] container2 = new Container[5];
+    Container[] container3 = new Container[5];
+    Container box1 = new Container();
+    Container box2 = new Container();
+    Container box3 = new Container();
+    Container bmwVehicle = new Container();
+    Container hondaVehicle = new Container();
+
+    ArrayList<Container[]> masterListContainer = new ArrayList<Container[]>();
+    ArrayList<Container> masterListNonContainer = new ArrayList<Container>();
+
+    public void setMasterListContainer(){
+        this.masterListContainer.add(shipContainer);
+        this.masterListContainer.add(container1);
+        this.masterListContainer.add(container2);
+        this.masterListContainer.add(container3);
+    }
+
+    public void setMasterListNonContainer(){
+        this.masterListNonContainer.add(box1);
+        this.masterListNonContainer.add(box2);
+        this.masterListNonContainer.add(box3);
+        this.masterListNonContainer.add(bmwVehicle);
+        this.masterListNonContainer.add(hondaVehicle);
+    }
+
     public AddRemoveWindow(){
         setSize(500,300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);  //closes this window without closing the others
@@ -36,12 +65,18 @@ public class AddRemoveWindow extends JFrame {
 
 
 
-        closeButton.addActionListener(new ActionListener() {
+        closeButton.addActionListener(e -> {
+            //Want it to close only this window but not the main one
+        });
+
+        addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Want it to close only this window but not the main one
+                textAreaLeft.setText(masterListNonContainer.get(0).description);
             }
         });
+
+
 
         //addRemovePanel.add(closeButton);
         addRemovePanel.add(textAreaLeft);

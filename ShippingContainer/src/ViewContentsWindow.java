@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ViewContentsWindow extends JFrame {
+
     public ViewContentsWindow(){
         setSize(400,300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);  //closes this window and not the others
