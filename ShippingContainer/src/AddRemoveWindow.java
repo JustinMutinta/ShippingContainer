@@ -5,21 +5,25 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class AddRemoveWindow extends JFrame {
-    Container[] shipContainer = new Container[5];
-    Container[] container1 = new Container[5];
+    Container[][] shipContainer = new Container[5][]; //[][] will allow the shipContainer to hold other Arrays.
+
+    Container[] container1 = new Container[5]; //Containers will hold objects in them
     Container[] container2 = new Container[5];
     Container[] container3 = new Container[5];
-    Container box1 = new Container();
-    Container box2 = new Container();
-    Container box3 = new Container();
-    Container bmwVehicle = new Container();
-    Container hondaVehicle = new Container();
+    Container[] platform1 = new Container[1];
+    Container[] platform2 = new Container[1];
+
+    Container box1 = new Container("Box 1");           //Objects that will be transported
+    Container box2 = new Container("Box 2");
+    Container box3 = new Container("Box 3");
+    Container bmwVehicle = new Container("BMW Vehicle");
+    Container hondaVehicle = new Container("Honda Vehicle");
 
     ArrayList<Container[]> masterListContainer = new ArrayList<Container[]>();
     ArrayList<Container> masterListNonContainer = new ArrayList<Container>();
 
     public void setMasterListContainer(){
-        this.masterListContainer.add(shipContainer);
+      //  this.masterListContainer.add(shipContainer);
         this.masterListContainer.add(container1);
         this.masterListContainer.add(container2);
         this.masterListContainer.add(container3);
@@ -48,6 +52,15 @@ public class AddRemoveWindow extends JFrame {
         JButton removeButton = new JButton("Remove <<");
         JButton closeButton = new JButton("Close");
 
+        JComboBox containerComboBox = new JComboBox();
+        //containerComboBox.addItem("Test");        //FYI: this works
+        /*
+        for(int i = 0; i < masterListContainer.size(); i++){
+            containerComboBox.addItem(masterListContainer.get(i));
+        }
+                                                    //FYI: this does not work
+         */
+
         Insets insets = getInsets();
         Dimension size;
 
@@ -58,12 +71,16 @@ public class AddRemoveWindow extends JFrame {
         textAreaRight.setBounds(310 + insets.left, 25 + insets.top, size.width + 100, size.height + 150);
 
         size = addButton.getPreferredSize();
-        addButton.setBounds(130 + insets.left, 25 + insets.top, size.width + 100, size.height);
+        addButton.setBounds(130 + insets.left, 75 + insets.top, size.width + 100, size.height);
 
         size = removeButton.getPreferredSize();
-        removeButton.setBounds(130 + insets.left, 75 + insets.top, size.width + 100, size.height);
+        removeButton.setBounds(130 + insets.left, 150 + insets.top, size.width + 100, size.height);
 
+        size = containerComboBox.getPreferredSize();
+        containerComboBox.setBounds(130 + insets.left, 25 + insets.top, size.width + 100, size.height);
 
+        setMasterListNonContainer();   //Need to run these functions. Otherwise arrays will be empty and you'll get exception errors
+        setMasterListContainer();       //Also need this one.
 
         closeButton.addActionListener(e -> {
             //Want it to close only this window but not the main one
@@ -72,7 +89,10 @@ public class AddRemoveWindow extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textAreaLeft.setText(masterListNonContainer.get(0).description);
+                for(int i = 0; i < masterListNonContainer.size(); i++){ // for testing purposes. Was able to get objects to show up in left text box
+                    textAreaLeft.append(masterListNonContainer.get(i).description + "\n");
+                }
+                //textAreaLeft.append(masterListNonContainer.get(0).description + "\n");
             }
         });
 
@@ -83,6 +103,7 @@ public class AddRemoveWindow extends JFrame {
         addRemovePanel.add(textAreaRight);
         addRemovePanel.add(addButton);
         addRemovePanel.add(removeButton);
+        addRemovePanel.add(containerComboBox);
 
 
         add(addRemovePanel);
