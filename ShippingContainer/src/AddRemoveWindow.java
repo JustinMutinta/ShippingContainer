@@ -79,6 +79,7 @@ public class AddRemoveWindow extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                textAreaLeft.setText("");
                 for(int i = 0; i < masterListNonContainer.size(); i++){ // for testing purposes. Was able to get objects to show up in left text box
                     textAreaLeft.append(i + ". " + masterListNonContainer.get(i).description + "\n");
                 }
