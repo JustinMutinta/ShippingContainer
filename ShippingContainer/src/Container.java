@@ -1,12 +1,12 @@
 public class Container{ //Class to create objects
-    int height;
+    int height;             //Global variables that can be edited by the functions below
     int width;
     int length;
     int weight;
     String description;
     String serialNumber;
 
-    public Container(){
+    public Container(){ //When an object is created with a new Container(), this function creates the object BUT the variables will be null
 
     }
 
@@ -19,7 +19,7 @@ public class Container{ //Class to create objects
         this.serialNumber = serialNumber;
     }
 
-    public Container(String description){  //function to create object
+    public Container(String description){  //function to create object with only the description. This will be used for making boxes
         this.height = 10;
         this.width = 10;
         this.length = 10;

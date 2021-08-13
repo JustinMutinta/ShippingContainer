@@ -2,14 +2,14 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainWindows extends JFrame {  //main window
+public class MainWindows extends JFrame {  //main window extending JFrame
 
-    public MainWindows(){
-        setSize(200,200);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    public MainWindows(){                   //create main GUI
+        setSize(200,200);       //Set the size of the Window
+        setDefaultCloseOperation(EXIT_ON_CLOSE); //enable the X button to close the window
 
-        JButton addRemoveButton = new JButton("Add/Remove");  //To Add/Remove Window
-        addRemoveButton.addActionListener(new ActionListener() {
+        JButton addRemoveButton = new JButton("Add/Remove");  //To open the Add/Remove Window
+        addRemoveButton.addActionListener(new ActionListener() {    //creates an action listener for the button. When clicked, will open the other window
             @Override
             public void actionPerformed(ActionEvent e) {
                 new AddRemoveWindow();
@@ -33,7 +33,7 @@ public class MainWindows extends JFrame {  //main window
         });
 
 
-        JPanel mainPanel = new JPanel();
+        JPanel mainPanel = new JPanel();        //create panel to hold objects and add objects to it
         mainPanel.setSize(200,200);
         mainPanel.add(addRemoveButton);
         mainPanel.add(viewContButton);
@@ -41,7 +41,7 @@ public class MainWindows extends JFrame {  //main window
 
 
 
-        add(mainPanel);
-        setVisible(true);
+        add(mainPanel);                 //add panel to frame
+        setVisible(true);               //set the frame to visible
     }
 }
