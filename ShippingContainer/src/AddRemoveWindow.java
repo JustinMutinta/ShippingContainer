@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class AddRemoveWindow extends JFrame {
 
     JTextArea textAreaRight;            //Making this a global value so that other functions can access it.
+    JTextArea textAreaLeft;
 
     Container[][] shipContainer = new Container[5][]; //[][] will allow the shipContainer to hold other Arrays.
 
@@ -40,7 +41,7 @@ public class AddRemoveWindow extends JFrame {
         addRemovePanel.setLayout(null);
 
 
-        JTextArea textAreaLeft = new JTextArea("Left");   //Display text area on the left
+        textAreaLeft = new JTextArea("");   //Display text area on the left
         //JTextArea textAreaRight = new JTextArea("Right"); //Display text area on the right //moved to global variable so other functions can work with it
         textAreaRight = new JTextArea("Right");
 
@@ -71,6 +72,11 @@ public class AddRemoveWindow extends JFrame {
         containerComboBox.setBounds(130 + insets.left, 25 + insets.top, size.width + 80, size.height);
 
         setMasterListNonContainer();   //Need to run these functions. Otherwise arrays will be empty and you'll get exception errors
+
+        //textAreaLeft.setText(masterListNonContainer.get(1).description);
+        for(int i = 0; i < masterListNonContainer.size(); i++){
+            textAreaLeft.append(masterListNonContainer.get(i).description + "\n");
+        }
 
         closeButton.addActionListener(e -> {
             //Want it to close only this window but not the main one
