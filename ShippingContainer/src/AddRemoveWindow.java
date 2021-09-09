@@ -33,6 +33,12 @@ public class AddRemoveWindow extends JFrame {
         this.masterListNonContainer.add(hondaVehicle);
     }
 
+    public void setTextAreaLeft(){
+        for(int i = 0; i < masterListNonContainer.size(); i++){
+            textAreaLeft.append((i + 1) + ". " + masterListNonContainer.get(i).description + "\n");
+        }
+    }
+
     public AddRemoveWindow(){
         setSize(500,300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);  //closes this window without closing the others
@@ -71,12 +77,17 @@ public class AddRemoveWindow extends JFrame {
         size = containerComboBox.getPreferredSize();
         containerComboBox.setBounds(130 + insets.left, 25 + insets.top, size.width + 80, size.height);
 
+        JTextArea numBox = new JTextArea();
+        size = numBox.getPreferredSize();
+        numBox.setBounds(210 + insets.left, 125 + insets.top, size.width + 50, size.height);
+
+        JLabel numLabel = new JLabel("Enter a number of the object to move");
+        size = numLabel.getPreferredSize();
+        numLabel.setBounds(130 + insets.left, 105 + insets.top, size.width, size.height);
+
         setMasterListNonContainer();   //Need to run these functions. Otherwise arrays will be empty and you'll get exception errors
 
-        //textAreaLeft.setText(masterListNonContainer.get(1).description);
-        for(int i = 0; i < masterListNonContainer.size(); i++){
-            textAreaLeft.append(masterListNonContainer.get(i).description + "\n");
-        }
+        setTextAreaLeft();
 
         closeButton.addActionListener(e -> {
             //Want it to close only this window but not the main one
@@ -127,6 +138,8 @@ public class AddRemoveWindow extends JFrame {
         addRemovePanel.add(addButton);
         addRemovePanel.add(removeButton);
         addRemovePanel.add(containerComboBox);
+        addRemovePanel.add(numBox);
+        addRemovePanel.add(numLabel);
 
 
         add(addRemovePanel);
