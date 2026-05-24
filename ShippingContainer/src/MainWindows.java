@@ -1,47 +1,46 @@
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 
-public class MainWindows extends JFrame {  //main window extending JFrame
+public class MainWindows extends JFrame {
 
-    public MainWindows(){                   //create main GUI
-        setSize(200,200);       //Set the size of the Window
-        setDefaultCloseOperation(EXIT_ON_CLOSE); //enable the X button to close the window
+    private final ShipData data = new ShipData();
 
-        JButton addRemoveButton = new JButton("Add/Remove");  //To open the Add/Remove Window
-        addRemoveButton.addActionListener(new ActionListener() {    //creates an action listener for the button. When clicked, will open the other window
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AddRemoveWindow();
-            }
-        });
+    public MainWindows() {
+        setTitle("Shipping Container Manager");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
 
-        JButton viewContButton = new JButton("View Contents");  //To View ContentWindow
-        viewContButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new ViewContentsWindow();
-            }
-        });
+        JButton addRemoveButton = new JButton("Add / Remove Items");
+        JButton viewContButton  = new JButton("View Container Contents");
+        JButton closeButton     = new JButton("Close");
 
-        JButton closeButton = new JButton("Close");         //To close the window
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        addRemoveButton.addActionListener(e -> new AddRemoveWindow(data));
+        viewContButton.addActionListener(e -> new ViewContentsWindow(data));
+        closeButton.addActionListener(e -> System.exit(0));
 
+        // Make all buttons the same width
+        Dimension btnSize = new Dimension(200, 35);
+        addRemoveButton.setPreferredSize(btnSize);
+        viewContButton.setPreferredSize(btnSize);
+        closeButton.setPreferredSize(btnSize);
 
-        JPanel mainPanel = new JPanel();        //create panel to hold objects and add objects to it
-        mainPanel.setSize(200,200);
-        mainPanel.add(addRemoveButton);
-        mainPanel.add(viewContButton);
-        mainPanel.add(closeButton);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+        addRemoveButton.setAlignmentX(CENTER_ALIGNMENT);
+        viewContButton.setAlignmentX(CENTER_ALIGNMENT);
+        closeButton.setAlignmentX(CENTER_ALIGNMENT);
 
+        panel.add(addRemoveButton);
+        panel.add(Box.createVerticalStrut(8));
+        panel.add(viewContButton);
+        panel.add(Box.createVerticalStrut(8));
+        panel.add(closeButton);
 
-        add(mainPanel);                 //add panel to frame
-        setVisible(true);               //set the frame to visible
+        add(panel);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 }

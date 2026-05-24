@@ -1,149 +1,152 @@
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class AddRemoveWindow extends JFrame {
 
-    JTextArea textAreaRight;            //Making this a global value so that other functions can access it.
+    private final ShipData data;
 
-    Container[][] shipContainer = new Container[5][]; //[][] will allow the shipContainer to hold other Arrays.
+    private final DefaultListModel<Container> availableModel  = new DefaultListModel<>();
+    private final DefaultListModel<Container> containerModel  = new DefaultListModel<>();
+    private final JList<Container>            availableList   = new JList<>(availableModel);
+    private final JList<Container>            containerList   = new JList<>(containerModel);
+    private       JComboBox<String>           containerComboBox;
+    private       JLabel                      statusLabel;
+    private       TitledBorder                containerBorder;
 
-    Container[] container1 = new Container[5]; //Containers will hold objects in them
-    Container[] container2 = new Container[5];
-    Container[] container3 = new Container[5];
-    Container[] platform1 = new Container[1]; //This will be used for the vehicles or objects that are bigger than a box
-    Container[] platform2 = new Container[1];
+    private static final String[] CONTAINER_NAMES =
+            {"Container 1", "Container 2", "Container 3", "Platform 1", "Platform 2"};
 
-    Container box1 = new Container("Box 1");           //Objects to be transported and/or put into containers
-    Container box2 = new Container("Box 2");
-    Container box3 = new Container("Box 3");
-    Container bmwVehicle = new Container(60, 60, 120, 450, "BMW Vehicle", "45RFT90RV");
-    Container hondaVehicle = new Container(54, 60, 100, 450, "Honda Vehicle", "KL5690TR5");
+    public AddRemoveWindow(ShipData data) {
+        this.data = data;
 
-    ArrayList<Container> masterListNonContainer = new ArrayList<Container>(); //ArrayList of all objects to be moved. ArrayList so it can grow/shrink as the user changes the list
+        setTitle("Add / Remove Items");
+        setSize(650, 420);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout(8, 8));
 
-    public void setMasterListNonContainer(){
-        this.masterListNonContainer.add(box1);
-        this.masterListNonContainer.add(box2);
-        this.masterListNonContainer.add(box3);
-        this.masterListNonContainer.add(bmwVehicle);
-        this.masterListNonContainer.add(hondaVehicle);
-    }
+        buildTopPanel();
+        buildContentPanel();
+        buildStatusBar();
 
-    public AddRemoveWindow(){
-        setSize(500,300);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);  //closes this window without closing the others
+        refreshAvailableList();
+        refreshContainerList();
 
-        JPanel addRemovePanel = new JPanel();
-        addRemovePanel.setLayout(null);
-
-
-        JTextArea textAreaLeft = new JTextArea("Left");   //Display text area on the left
-        //JTextArea textAreaRight = new JTextArea("Right"); //Display text area on the right //moved to global variable so other functions can work with it
-        textAreaRight = new JTextArea("Right");
-
-        JButton addButton = new JButton("Add >>");
-        JButton removeButton = new JButton("Remove <<");
-        JButton closeButton = new JButton("Close");
-
-        String[] containerArray = {"Ship", "Container 1", "Container 2", "Container 3", "Platform 1", "Platform 2"};
-        JComboBox containerComboBox = new JComboBox(containerArray);
-        //containerComboBox.addItem("Test");        //FYI: this works. This is for future reference
-
-        Insets insets = getInsets();
-        Dimension size;
-
-        size = textAreaLeft.getPreferredSize();
-        textAreaLeft.setBounds(5 + insets.left, 25 + insets.top, size.width + 100, size.height + 150);
-
-        size = textAreaRight.getPreferredSize();
-        textAreaRight.setBounds(310 + insets.left, 25 + insets.top, size.width + 100, size.height + 150);
-
-        size = addButton.getPreferredSize();
-        addButton.setBounds(130 + insets.left, 75 + insets.top, size.width + 100, size.height);
-
-        size = removeButton.getPreferredSize();
-        removeButton.setBounds(130 + insets.left, 150 + insets.top, size.width + 75, size.height);
-
-        size = containerComboBox.getPreferredSize();
-        containerComboBox.setBounds(130 + insets.left, 25 + insets.top, size.width + 80, size.height);
-
-        setMasterListNonContainer();   //Need to run these functions. Otherwise arrays will be empty and you'll get exception errors
-
-        closeButton.addActionListener(e -> {
-            //Want it to close only this window but not the main one
-        });
-
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                textAreaLeft.setText("");
-                for(int i = 0; i < masterListNonContainer.size(); i++){ // for testing purposes. Was able to get objects to show up in left text box
-                    textAreaLeft.append(i + ". " + masterListNonContainer.get(i).description + "\n");
-                }
-            }
-        });
-
-        ActionListener comboBoxActionListener = new ActionListener() {  //Create new Action Lister for when the ComboBox is used. Used this because I did not want to add an "update" Button to the window
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String comboBoxValue = (String) containerComboBox.getSelectedItem();  //Creates String Value of what is selected in the comboBox
-
-                switch(comboBoxValue){                  //runs the following depending on the selected value
-                    case "Container 1":                 //If "Container 1" is selected...
-                        showContents(container1);       //The function showContents() is run
-                        break;                          //break, so that it know to stop here
-                    case "Container 2":
-                        showContents(container2);
-                        break;
-                    case "Container 3":
-                        showContents(container3);
-                        break;
-                    case "Platform 1":
-                        showContents(platform1);
-                        break;
-                    case "Platform 2":
-                        showContents(platform2);
-                        break;
-                }
-            }
-        };
-
-        containerComboBox.addActionListener(comboBoxActionListener);
-
-
-
-        //addRemovePanel.add(closeButton);
-        addRemovePanel.add(textAreaLeft);
-        addRemovePanel.add(textAreaRight);
-        addRemovePanel.add(addButton);
-        addRemovePanel.add(removeButton);
-        addRemovePanel.add(containerComboBox);
-
-
-        add(addRemovePanel);
-
-
-
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
+    private void buildTopPanel() {
+        containerComboBox = new JComboBox<>(CONTAINER_NAMES);
+        containerComboBox.addActionListener(e -> refreshContainerList());
 
-    public void showContents(Container[] selectedContainer){
-        textAreaRight.setText("");
-        if (selectedContainer == null){
-            textAreaRight.setText("This container is empty");
-        }else{
-            for(int i = 0; i < selectedContainer.length; i++){
-                if(selectedContainer[i] == null){
-                    textAreaRight.append("Nothing on " + i + "\n"); //Visual that there's nothing in that slot. Remember to remove
-                }else{
-                    textAreaRight.append(selectedContainer[i].description + "\n");
-                }
-            }
+        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        top.add(new JLabel("Selected container:"));
+        top.add(containerComboBox);
+        add(top, BorderLayout.NORTH);
+    }
+
+    private void buildContentPanel() {
+        // Left — available items
+        availableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JPanel leftPanel = new JPanel(new BorderLayout(0, 4));
+        leftPanel.setBorder(BorderFactory.createTitledBorder("Available Items"));
+        leftPanel.add(new JScrollPane(availableList), BorderLayout.CENTER);
+
+        // Center — buttons
+        JButton addButton    = new JButton("Add >>");
+        JButton removeButton = new JButton("<< Remove");
+        addButton.addActionListener(e -> addItem());
+        removeButton.addActionListener(e -> removeItem());
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+        addButton.setAlignmentX(CENTER_ALIGNMENT);
+        removeButton.setAlignmentX(CENTER_ALIGNMENT);
+        centerPanel.add(Box.createVerticalGlue());
+        centerPanel.add(addButton);
+        centerPanel.add(Box.createVerticalStrut(8));
+        centerPanel.add(removeButton);
+        centerPanel.add(Box.createVerticalGlue());
+
+        // Right — container contents
+        containerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        containerBorder = BorderFactory.createTitledBorder("Container Contents");
+        JPanel rightPanel = new JPanel(new BorderLayout(0, 4));
+        rightPanel.setBorder(containerBorder);
+        rightPanel.add(new JScrollPane(containerList), BorderLayout.CENTER);
+
+        JPanel content = new JPanel(new BorderLayout(8, 0));
+        content.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+        content.add(leftPanel,   BorderLayout.WEST);
+        content.add(centerPanel, BorderLayout.CENTER);
+        content.add(rightPanel,  BorderLayout.EAST);
+
+        // Give the left and right panels equal, fixed widths
+        leftPanel.setPreferredSize(new Dimension(230, 300));
+        rightPanel.setPreferredSize(new Dimension(230, 300));
+
+        add(content, BorderLayout.CENTER);
+    }
+
+    private void buildStatusBar() {
+        statusLabel = new JLabel(" ");
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(2, 8, 4, 8));
+        add(statusLabel, BorderLayout.SOUTH);
+    }
+
+    private void refreshAvailableList() {
+        availableModel.clear();
+        for (Container c : data.availableItems) {
+            availableModel.addElement(c);
+        }
+    }
+
+    private void refreshContainerList() {
+        containerModel.clear();
+        String selected      = (String) containerComboBox.getSelectedItem();
+        Container[] slots    = data.getContainerByName(selected);
+        if (slots == null) return;
+
+        for (Container c : slots) {
+            if (c != null) containerModel.addElement(c);
         }
 
+        int used = data.countItems(slots);
+        containerBorder.setTitle(selected + "  (" + used + "/" + slots.length + " slots used)");
+        containerList.getParent().repaint();
+    }
+
+    private void addItem() {
+        Container item = availableList.getSelectedValue();
+        if (item == null) {
+            statusLabel.setText("Select an item from the left list first.");
+            return;
+        }
+        String target = (String) containerComboBox.getSelectedItem();
+        if (data.addToContainer(item, target)) {
+            statusLabel.setText("Added \"" + item.description + "\" to " + target + ".");
+            refreshAvailableList();
+            refreshContainerList();
+        } else {
+            statusLabel.setText(target + " is full — remove an item first.");
+        }
+    }
+
+    private void removeItem() {
+        Container item = containerList.getSelectedValue();
+        if (item == null) {
+            statusLabel.setText("Select an item from the right list first.");
+            return;
+        }
+        String source = (String) containerComboBox.getSelectedItem();
+        if (data.removeFromContainer(item, source)) {
+            statusLabel.setText("Removed \"" + item.description + "\" from " + source + ".");
+            refreshAvailableList();
+            refreshContainerList();
+        } else {
+            statusLabel.setText("Could not remove item.");
+        }
     }
 }
