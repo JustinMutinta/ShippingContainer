@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipping Container Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Shipping Container Manager</h1>
+        <p class="header-sub">Manage cargo loading and unloading</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Three-column workspace -->
+    <div class="workspace">
+
+      <!-- Left: available items -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Available Items</span>
+          <span class="badge" id="available-count">0</span>
+        </div>
+        <ul class="item-list" id="available-list">
+          <li class="placeholder">Loading…</li>
+        </ul>
+      </div>
+
+      <!-- Center: controls -->
+      <div class="controls">
+        <div class="selector-card">
+          <label for="container-select">Container</label>
+          <select id="container-select">
+            <option>Container 1</option>
+            <option>Container 2</option>
+            <option>Container 3</option>
+            <option>Platform 1</option>
+            <option>Platform 2</option>
+          </select>
+          <div class="cap-bar-track"><div class="cap-bar" id="cap-bar"></div></div>
+          <div class="cap-text" id="cap-text">0 / 0 slots used</div>
+        </div>
+        <button class="btn btn-add"    id="add-btn">Add &gt;&gt;</button>
+        <button class="btn btn-remove" id="remove-btn">&lt;&lt; Remove</button>
+      </div>
+
+      <!-- Right: container contents -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title" id="container-title">Container 1</span>
+          <span class="badge" id="container-count">0</span>
+        </div>
+        <ul class="item-list" id="container-list">
+          <li class="placeholder">Empty</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar" id="status-bar">&nbsp;</div>
+
+    <!-- Details table -->
+    <div class="details-card">
+      <div class="panel-header">
+        <span class="panel-title">Container Details</span>
+      </div>
+      <div class="table-wrap">
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Serial Number</th>
+              <th>Height</th>
+              <th>Width</th>
+              <th>Length</th>
+              <th>Weight (lbs)</th>
+            </tr>
+          </thead>
+          <tbody id="details-body">
+            <tr><td colspan="6" class="placeholder">Select a container above.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

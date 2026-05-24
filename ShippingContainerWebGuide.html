@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shipping Container Web App – How It Was Built</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm 22mm 18mm; }
+  @media print {
+    .no-print   { display: none; }
+    h1,h2,h3    { page-break-after: avoid; }
+    pre,.card   { page-break-inside: avoid; }
+    .page-break { page-break-before: always; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.65;
+    color: #1a1a2e;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 60px 0 50px;
+    border-bottom: 3px solid #0b1f35;
+    margin-bottom: 48px;
+  }
+  .cover h1       { font-size: 26pt; color: #0b1f35; letter-spacing: -0.5px; }
+  .cover .subtitle{ font-size: 13pt; color: #1a4a7a; margin-top: 10px; }
+  .cover .meta    { margin-top: 28px; font-size: 10pt; color: #555; }
+
+  /* Headings */
+  h2 {
+    font-size: 15pt; color: #0b1f35;
+    margin: 36px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #e0e7ef;
+  }
+  h3 { font-size: 12pt; color: #1a4a7a; margin: 22px 0 6px; }
+  h4 { font-size: 11pt; color: #333; margin: 14px 0 4px; font-style: italic; }
+
+  p  { margin: 8px 0; }
+  ul,ol { margin: 8px 0 8px 24px; }
+  li { margin: 3px 0; }
+  strong { color: #0b1f35; }
+
+  /* Code */
+  code {
+    font-family: 'Consolas','Courier New',monospace;
+    font-size: 9.5pt;
+    background: #f0f4fa;
+    border: 1px solid #d4dff0;
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+  pre {
+    font-family: 'Consolas','Courier New',monospace;
+    font-size: 8.8pt;
+    background: #1e2a3a;
+    color: #cdd9e5;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    overflow-x: auto;
+    line-height: 1.55;
+  }
+  pre .kw { color: #79b8ff; }
+  pre .tp { color: #b392f0; }
+  pre .st { color: #9ecbff; }
+  pre .cm { color: #6a737d; font-style: italic; }
+  pre .nm { color: #f8c555; }
+  pre .mt { color: #85e89d; }
+  pre .an { color: #f97583; }
+
+  /* Cards */
+  .card {
+    border-left: 4px solid #1a4a7a;
+    background: #f0f4fa;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+  }
+  .card.tip  { border-color: #28a745; background: #f0faf3; }
+  .card.warn { border-color: #e67e22; background: #fdf6ec; }
+  .card-title{ font-weight: bold; margin-bottom: 4px; }
+
+  /* Diagram */
+  .diagram {
+    font-family: 'Consolas',monospace;
+    font-size: 9.5pt;
+    background: #f8fafc;
+    border: 1px solid #d4dff0;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    line-height: 1.8;
+    color: #1a1a2e;
+  }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }
+  th { background: #0b1f35; color: #fff; padding: 7px 10px; text-align: left; }
+  td { padding: 6px 10px; border-bottom: 1px solid #e0e7ef; }
+  tr:nth-child(even) td { background: #f8fafc; }
+
+  /* Section badge */
+  .sec-num {
+    display: inline-block;
+    background: #0b1f35; color: #fff;
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    line-height: 26px; text-align: center;
+    font-size: 11pt; font-weight: bold;
+    margin-right: 8px; vertical-align: middle;
+  }
+
+  .print-btn {
+    display: inline-block;
+    background: #0b1f35; color: #fff;
+    padding: 10px 24px; border-radius: 6px;
+    cursor: pointer; font-size: 11pt; border: none;
+    margin-bottom: 32px;
+  }
+  .print-btn:hover { background: #1a4a7a; }
+</style>
+</head>
+<body>
+
+<div class="no-print" style="text-align:right;margin-bottom:16px;">
+  <button class="print-btn" onclick="window.print()">Save as PDF (Ctrl+P)</button>
+</div>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Shipping Container Web App</h1>
+  <div class="subtitle">A guide to how the web version was designed and built</div>
+  <div class="meta">Java 20 &nbsp;·&nbsp; Spring Boot 3 &nbsp;·&nbsp; SQLite &nbsp;·&nbsp; REST API &nbsp;·&nbsp; HTML / CSS / JavaScript</div>
+</div>
+
+<!-- TOC -->
+<h2>Contents</h2>
+<ol>
+  <li>What Changed from the Desktop Version</li>
+  <li>Project Structure</li>
+  <li>The Build File: <code>pom.xml</code></li>
+  <li>The Database: SQLite + JPA</li>
+  <li>The Data Layer: Entity and Repository</li>
+  <li>The Business Logic: <code>ShipService</code></li>
+  <li>The REST API: <code>ShipController</code></li>
+  <li>Seeding the Database: <code>DataInitializer</code></li>
+  <li>The Frontend: HTML, CSS, and JavaScript</li>
+  <li>How a Request Travels Through the App</li>
+  <li>Key Concepts Explained</li>
+</ol>
+
+
+<!-- 1 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">1</span> What Changed from the Desktop Version</h2>
+
+<p>
+  The desktop Swing app and the web app solve the same problem, but in completely
+  different ways. The table below shows what was kept, what was replaced, and what
+  is new.
+</p>
+
+<table>
+  <tr><th>Concern</th><th>Desktop (Swing)</th><th>Web (Spring Boot)</th></tr>
+  <tr><td>UI rendering</td><td>Java Swing — OS windows</td><td>HTML + CSS in a browser</td></tr>
+  <tr><td>User interaction</td><td>ActionListeners on buttons</td><td>JavaScript Fetch API calls</td></tr>
+  <tr><td>Data storage</td><td>In-memory arrays (lost on exit)</td><td>SQLite database (persists)</td></tr>
+  <tr><td>Data model</td><td><code>ShipData.java</code> (plain class)</td><td><code>Item.java</code> (JPA Entity)</td></tr>
+  <tr><td>Business logic</td><td>Inside <code>ShipData</code></td><td><code>ShipService.java</code></td></tr>
+  <tr><td>Communication</td><td>Direct Java method calls</td><td>HTTP REST API (<code>/api/...</code>)</td></tr>
+  <tr><td>Layout</td><td><code>BorderLayout</code>, <code>BoxLayout</code></td><td>CSS Grid and Flexbox</td></tr>
+</table>
+
+<p>
+  The <strong>business rules</strong> (slot capacity, add/remove logic) transferred
+  almost unchanged. Only the delivery mechanism changed — from Java method calls to
+  HTTP requests.
+</p>
+
+
+<!-- 2 -->
+<h2><span class="sec-num">2</span> Project Structure</h2>
+
+<div class="diagram">
+ShippingContainerWeb/
+├── pom.xml                         ← Maven build file (dependencies, Java version)
+└── src/main/
+    ├── java/com/shipping/
+    │   ├── ShippingApplication.java    ← Entry point
+    │   ├── DataInitializer.java        ← Seeds the database on first run
+    │   ├── model/
+    │   │   ├── Item.java               ← JPA entity (maps to the database table)
+    │   │   ├── ContainerInfo.java      ← DTO sent to the browser
+    │   │   └── ApiResponse.java        ← DTO for success/error messages
+    │   ├── repository/
+    │   │   └── ItemRepository.java     ← Database queries (no SQL needed)
+    │   ├── service/
+    │   │   └── ShipService.java        ← Business logic
+    │   └── controller/
+    │       └── ShipController.java     ← REST API endpoints
+    └── resources/
+        ├── application.properties      ← Database config
+        └── static/
+            ├── index.html              ← Web page structure
+            ├── style.css               ← Visual styling
+            └── app.js                  ← Browser-side logic
+</div>
+
+<p>
+  Spring Boot automatically serves everything inside <code>static/</code> as public
+  files. When a browser visits <code>http://localhost:8080</code>, Spring Boot
+  returns <code>index.html</code>. The browser then loads <code>style.css</code> and
+  <code>app.js</code> and starts calling the API.
+</p>
+
+
+<!-- 3 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">3</span> The Build File: <code>pom.xml</code></h2>
+
+<p>
+  Maven is a build tool for Java. Its configuration file, <code>pom.xml</code>,
+  declares the project's dependencies (libraries it needs) and build settings.
+  Spring Boot's <strong>parent POM</strong> provides sensible defaults and manages
+  library versions automatically.
+</p>
+
+<pre>
+<span class="an">&lt;parent&gt;</span>
+    <span class="an">&lt;groupId&gt;</span>org.springframework.boot<span class="an">&lt;/groupId&gt;</span>
+    <span class="an">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="an">&lt;/artifactId&gt;</span>
+    <span class="an">&lt;version&gt;</span>3.2.5<span class="an">&lt;/version&gt;</span>
+<span class="an">&lt;/parent&gt;</span>
+</pre>
+
+<h3>The Four Dependencies</h3>
+
+<table>
+  <tr><th>Dependency</th><th>What it provides</th></tr>
+  <tr>
+    <td><code>spring-boot-starter-web</code></td>
+    <td>Embedded Tomcat web server + REST support. Without this, there is no HTTP server.</td>
+  </tr>
+  <tr>
+    <td><code>spring-boot-starter-data-jpa</code></td>
+    <td>Hibernate ORM + Spring Data — lets you query a database using Java objects instead of SQL.</td>
+  </tr>
+  <tr>
+    <td><code>sqlite-jdbc</code></td>
+    <td>The JDBC driver that lets Java talk to an SQLite file.</td>
+  </tr>
+  <tr>
+    <td><code>hibernate-community-dialects</code></td>
+    <td>Teaches Hibernate the quirks of SQLite (e.g. how auto-increment IDs work).</td>
+  </tr>
+</table>
+
+<div class="card tip">
+  <div class="card-title">Why an embedded server?</div>
+  Spring Boot bundles Tomcat inside the JAR file. You do not need to install a separate
+  web server — running <code>mvn spring-boot:run</code> is enough to get a fully
+  working HTTP server on port 8080.
+</div>
+
+<h3>Running the App</h3>
+<pre>
+<span class="cm"># From the ShippingContainerWeb/ directory:</span>
+mvn spring-boot:run
+</pre>
+<p>Then open <code>http://localhost:8080</code> in any browser.</p>
+
+
+<!-- 4 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">4</span> The Database: SQLite + JPA</h2>
+
+<h3>Why SQLite?</h3>
+<p>
+  SQLite stores an entire database in a single file (<code>shipping.db</code>).
+  There is no server to install or configure. When the Spring Boot app starts,
+  it opens that file (creating it if it does not exist). This makes it ideal
+  for small, self-contained applications.
+</p>
+
+<h3>application.properties</h3>
+<pre>
+spring.datasource.url=jdbc:sqlite:shipping.db
+spring.datasource.driver-class-name=org.sqlite.JDBC
+spring.jpa.properties.hibernate.dialect=org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.hibernate.ddl-auto=update
+</pre>
+
+<table>
+  <tr><th>Property</th><th>What it does</th></tr>
+  <tr><td><code>datasource.url</code></td><td>Points to the SQLite file. A relative path puts it in the working directory.</td></tr>
+  <tr><td><code>driver-class-name</code></td><td>Tells Spring which JDBC driver to use to connect.</td></tr>
+  <tr><td><code>hibernate.dialect</code></td><td>Tells Hibernate which SQL "dialect" to generate — SQLite has some differences from MySQL or PostgreSQL.</td></tr>
+  <tr><td><code>ddl-auto=update</code></td><td>Hibernate creates the <code>items</code> table automatically on first run, and updates it if the schema changes.</td></tr>
+</table>
+
+<h3>What JPA Does</h3>
+<p>
+  <strong>JPA (Java Persistence API)</strong> is a standard for mapping Java objects
+  to database rows. <strong>Hibernate</strong> is the implementation of that standard
+  used here. Instead of writing:
+</p>
+<pre>
+<span class="cm">// Raw SQL — error-prone and verbose</span>
+<span class="tp">ResultSet</span> rs = stmt.<span class="mt">executeQuery</span>(<span class="st">"SELECT * FROM items WHERE container_name IS NULL"</span>);
+</pre>
+<p>You write:</p>
+<pre>
+<span class="cm">// JPA — type-safe, no SQL</span>
+<span class="tp">List</span>&lt;<span class="tp">Item</span>&gt; available = itemRepository.<span class="mt">findByContainerNameIsNull</span>();
+</pre>
+<p>
+  Hibernate translates the method name into the correct SQL query automatically.
+</p>
+
+
+<!-- 5 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">5</span> The Data Layer: Entity and Repository</h2>
+
+<h3>Item.java — The Entity</h3>
+<p>
+  An <strong>entity</strong> is a Java class that maps directly to a database table.
+  Each field becomes a column; each instance becomes a row.
+</p>
+
+<pre>
+<span class="an">@Entity</span>
+<span class="an">@Table</span>(name = <span class="st">"items"</span>)
+<span class="kw">public class</span> <span class="tp">Item</span> {
+
+    <span class="an">@Id</span>
+    <span class="an">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="tp">Long</span> id;             <span class="cm">// auto-assigned by SQLite</span>
+
+    <span class="kw">private</span> <span class="tp">String</span>  description;
+    <span class="kw">private</span> <span class="tp">String</span>  serialNumber;
+    <span class="kw">private int</span>     height, width, length, weight;
+
+    <span class="an">@Column</span>(name = <span class="st">"container_name"</span>)
+    <span class="kw">private</span> <span class="tp">String</span>  containerName; <span class="cm">// null = available; "Container 1" = loaded</span>
+
+    <span class="an">@Column</span>(name = <span class="st">"slot_index"</span>)
+    <span class="kw">private</span> <span class="tp">Integer</span> slotIndex;     <span class="cm">// which slot within the container</span>
+}
+</pre>
+
+<p>
+  The two nullable fields — <code>containerName</code> and <code>slotIndex</code> —
+  replace the entire array structure from the desktop version. A <code>null</code>
+  <code>containerName</code> means the item is available; a non-null value means it
+  is loaded into that container at that slot. One table, one query, same data.
+</p>
+
+<h3>Annotation Quick Reference</h3>
+<table>
+  <tr><th>Annotation</th><th>Meaning</th></tr>
+  <tr><td><code>@Entity</code></td><td>Marks this class as a JPA entity — Hibernate will manage it.</td></tr>
+  <tr><td><code>@Table(name=...)</code></td><td>Sets the database table name (defaults to the class name if omitted).</td></tr>
+  <tr><td><code>@Id</code></td><td>This field is the primary key.</td></tr>
+  <tr><td><code>@GeneratedValue</code></td><td>The database auto-generates this value (SQLite uses ROWID).</td></tr>
+  <tr><td><code>@Column(name=...)</code></td><td>Maps the field to a column with a specific name.</td></tr>
+</table>
+
+<h3>ItemRepository.java — The Repository</h3>
+<p>
+  A <strong>repository</strong> is an interface that Spring Data implements for you
+  at runtime. Declaring a method with the right name is all that is needed — no SQL,
+  no implementation class.
+</p>
+
+<pre>
+<span class="kw">public interface</span> <span class="tp">ItemRepository</span> <span class="kw">extends</span> <span class="tp">JpaRepository</span>&lt;<span class="tp">Item</span>, <span class="tp">Long</span>&gt; {
+
+    <span class="tp">List</span>&lt;<span class="tp">Item</span>&gt; <span class="mt">findByContainerNameIsNull</span>();          <span class="cm">// SELECT * WHERE container_name IS NULL</span>
+    <span class="tp">List</span>&lt;<span class="tp">Item</span>&gt; <span class="mt">findByContainerName</span>(<span class="tp">String</span> name);    <span class="cm">// SELECT * WHERE container_name = ?</span>
+}
+</pre>
+
+<p>
+  <code>JpaRepository&lt;Item, Long&gt;</code> also provides built-in methods for free:
+  <code>findById()</code>, <code>save()</code>, <code>count()</code>,
+  <code>saveAll()</code>, and more.
+</p>
+
+<div class="card">
+  <div class="card-title">Spring Data method naming convention</div>
+  Spring Data reads the method name and generates the query.
+  <code>findBy</code> → SELECT, <code>ContainerName</code> → WHERE container_name,
+  <code>IsNull</code> → IS NULL. Chaining words builds the WHERE clause.
+</div>
+
+
+<!-- 6 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">6</span> The Business Logic: <code>ShipService</code></h2>
+
+<p>
+  The service layer sits between the controller (web) and the repository (database).
+  It owns all the business rules: slot capacity, finding the first empty slot, and
+  deciding whether an add or remove is valid.
+</p>
+
+<pre>
+<span class="an">@Service</span>
+<span class="an">@Transactional</span>
+<span class="kw">public class</span> <span class="tp">ShipService</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="kw">private</span> <span class="tp">ItemRepository</span> itemRepository;
+
+    <span class="kw">public static final</span> <span class="tp">Map</span>&lt;<span class="tp">String</span>, <span class="tp">Integer</span>&gt; CAPACITIES = <span class="tp">Map</span>.<span class="mt">of</span>(
+            <span class="st">"Container 1"</span>, <span class="nm">5</span>,  <span class="st">"Container 2"</span>, <span class="nm">5</span>,  <span class="st">"Container 3"</span>, <span class="nm">5</span>,
+            <span class="st">"Platform 1"</span>,  <span class="nm">1</span>,  <span class="st">"Platform 2"</span>,  <span class="nm">1</span>
+    );
+}
+</pre>
+
+<h3>@Service and @Transactional</h3>
+<ul>
+  <li><code>@Service</code> — marks this as a Spring-managed bean. Spring creates one instance and injects it wherever it is needed.</li>
+  <li><code>@Transactional</code> — wraps every method in a database transaction. If anything goes wrong mid-method, all changes are rolled back automatically.</li>
+  <li><code>@Autowired</code> — Spring injects the <code>ItemRepository</code> instance automatically. You never call <code>new ItemRepository()</code>.</li>
+</ul>
+
+<h3>The Add Logic</h3>
+<pre>
+<span class="kw">public boolean</span> <span class="mt">addToContainer</span>(<span class="tp">Long</span> itemId, <span class="tp">String</span> containerName) {
+    <span class="tp">Item</span> item = itemRepository.<span class="mt">findById</span>(itemId).<span class="mt">orElse</span>(<span class="kw">null</span>);
+
+    <span class="cm">// Guard: item must exist and not already be in a container</span>
+    <span class="kw">if</span> (item == <span class="kw">null</span> || item.<span class="mt">getContainerName</span>() != <span class="kw">null</span>) <span class="kw">return false</span>;
+
+    <span class="tp">Integer</span> capacity = CAPACITIES.<span class="mt">get</span>(containerName);
+    <span class="tp">List</span>&lt;<span class="tp">Item</span>&gt; current = itemRepository.<span class="mt">findByContainerName</span>(containerName);
+
+    <span class="cm">// Guard: container must have space</span>
+    <span class="kw">if</span> (current.<span class="mt">size</span>() >= capacity) <span class="kw">return false</span>;
+
+    <span class="cm">// Find first slot not already occupied</span>
+    <span class="tp">Set</span>&lt;<span class="tp">Integer</span>&gt; usedSlots = current.<span class="mt">stream</span>()
+            .<span class="mt">map</span>(<span class="tp">Item</span>::<span class="mt">getSlotIndex</span>).<span class="mt">filter</span>(<span class="tp">Objects</span>::<span class="mt">nonNull</span>)
+            .<span class="mt">collect</span>(<span class="tp">Collectors</span>.<span class="mt">toSet</span>());
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; capacity; i++) {
+        <span class="kw">if</span> (!usedSlots.<span class="mt">contains</span>(i)) {
+            item.<span class="mt">setContainerName</span>(containerName);
+            item.<span class="mt">setSlotIndex</span>(i);
+            itemRepository.<span class="mt">save</span>(item);   <span class="cm">// writes to SQLite</span>
+            <span class="kw">return true</span>;
+        }
+    }
+    <span class="kw">return false</span>;
+}
+</pre>
+
+<p>
+  The remove logic is simpler: find the item by ID, set both
+  <code>containerName</code> and <code>slotIndex</code> back to <code>null</code>,
+  and save. The item immediately reappears in the available pool.
+</p>
+
+
+<!-- 7 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">7</span> The REST API: <code>ShipController</code></h2>
+
+<p>
+  A <strong>REST API</strong> exposes data and operations over HTTP. The browser
+  sends HTTP requests; the server responds with JSON. The controller maps each
+  URL to a Java method.
+</p>
+
+<pre>
+<span class="an">@RestController</span>
+<span class="an">@RequestMapping</span>(<span class="st">"/api"</span>)
+<span class="kw">public class</span> <span class="tp">ShipController</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="kw">private</span> <span class="tp">ShipService</span> shipService;
+
+    <span class="an">@GetMapping</span>(<span class="st">"/items/available"</span>)
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">Item</span>&gt; <span class="mt">getAvailableItems</span>() {
+        <span class="kw">return</span> shipService.<span class="mt">getAvailableItems</span>();
+    }
+
+    <span class="an">@PostMapping</span>(<span class="st">"/containers/{name}/items/{itemId}"</span>)
+    <span class="kw">public</span> <span class="tp">ResponseEntity</span>&lt;<span class="tp">ApiResponse</span>&gt; <span class="mt">addItem</span>(
+            <span class="an">@PathVariable</span> <span class="tp">String</span> name,
+            <span class="an">@PathVariable</span> <span class="tp">Long</span>   itemId) {
+        <span class="kw">boolean</span> success = shipService.<span class="mt">addToContainer</span>(itemId, name);
+        <span class="kw">if</span> (success)
+            <span class="kw">return</span> <span class="tp">ResponseEntity</span>.<span class="mt">ok</span>(<span class="kw">new</span> <span class="tp">ApiResponse</span>(<span class="kw">true</span>,  <span class="st">"Added to "</span> + name));
+        <span class="kw">return</span> <span class="tp">ResponseEntity</span>.<span class="mt">badRequest</span>()
+                              .<span class="mt">body</span>(<span class="kw">new</span> <span class="tp">ApiResponse</span>(<span class="kw">false</span>, name + <span class="st">" is full."</span>));
+    }
+
+    <span class="an">@DeleteMapping</span>(<span class="st">"/items/{itemId}/placement"</span>)
+    <span class="kw">public</span> <span class="tp">ResponseEntity</span>&lt;<span class="tp">ApiResponse</span>&gt; <span class="mt">removeItem</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> itemId) {
+        <span class="kw">boolean</span> success = shipService.<span class="mt">removeFromContainer</span>(itemId);
+        ...
+    }
+}
+</pre>
+
+<h3>Annotation Quick Reference</h3>
+<table>
+  <tr><th>Annotation</th><th>HTTP method</th><th>Purpose</th></tr>
+  <tr><td><code>@GetMapping</code></td><td>GET</td><td>Read data (no side effects)</td></tr>
+  <tr><td><code>@PostMapping</code></td><td>POST</td><td>Create / trigger an action</td></tr>
+  <tr><td><code>@DeleteMapping</code></td><td>DELETE</td><td>Remove something</td></tr>
+  <tr><td><code>@PathVariable</code></td><td>—</td><td>Extracts <code>{name}</code> or <code>{itemId}</code> from the URL</td></tr>
+</table>
+
+<h3>The Full API Surface</h3>
+<table>
+  <tr><th>Method</th><th>URL</th><th>What it does</th></tr>
+  <tr><td>GET</td><td><code>/api/items/available</code></td><td>Returns all items not in any container</td></tr>
+  <tr><td>GET</td><td><code>/api/containers</code></td><td>Returns all containers with their contents and capacity</td></tr>
+  <tr><td>POST</td><td><code>/api/containers/{name}/items/{id}</code></td><td>Loads item into the container</td></tr>
+  <tr><td>DELETE</td><td><code>/api/items/{id}/placement</code></td><td>Removes item from its container</td></tr>
+</table>
+
+<h3>ResponseEntity and HTTP Status Codes</h3>
+<p>
+  <code>ResponseEntity</code> lets you control the HTTP status code alongside the
+  response body. A successful add returns <strong>200 OK</strong>; a full container
+  returns <strong>400 Bad Request</strong>. The browser's JavaScript checks
+  <code>data.success</code> to decide which status message to show the user.
+</p>
+
+<h3>JSON Serialisation</h3>
+<p>
+  Spring Boot includes <strong>Jackson</strong>, which automatically converts Java
+  objects to JSON. Returning a <code>List&lt;Item&gt;</code> from a controller method
+  produces:
+</p>
+<pre>
+[
+  { <span class="st">"id"</span>: <span class="nm">1</span>, <span class="st">"description"</span>: <span class="st">"Box 1"</span>, <span class="st">"serialNumber"</span>: <span class="st">"No Serial Number"</span>,
+    <span class="st">"height"</span>: <span class="nm">10</span>, <span class="st">"width"</span>: <span class="nm">10</span>, <span class="st">"length"</span>: <span class="nm">10</span>, <span class="st">"weight"</span>: <span class="nm">5</span>,
+    <span class="st">"containerName"</span>: <span class="kw">null</span>, <span class="st">"slotIndex"</span>: <span class="kw">null</span> },
+  ...
+]
+</pre>
+
+
+<!-- 8 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">8</span> Seeding the Database: <code>DataInitializer</code></h2>
+
+<p>
+  The app needs starter data on first launch. <code>DataInitializer</code> inserts
+  the 13 items into the database automatically — but only if the table is empty,
+  so it does not duplicate data on every restart.
+</p>
+
+<pre>
+<span class="an">@Component</span>
+<span class="kw">public class</span> <span class="tp">DataInitializer</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="kw">private</span> <span class="tp">ItemRepository</span> itemRepository;
+
+    <span class="an">@PostConstruct</span>
+    <span class="kw">public void</span> <span class="mt">seed</span>() {
+        <span class="kw">if</span> (itemRepository.<span class="mt">count</span>() > <span class="nm">0</span>) <span class="kw">return</span>; <span class="cm">// already seeded</span>
+
+        itemRepository.<span class="mt">saveAll</span>(<span class="tp">List</span>.<span class="mt">of</span>(
+            <span class="kw">new</span> <span class="tp">Item</span>(<span class="st">"Box 1"</span>, <span class="st">"No Serial Number"</span>, <span class="nm">10</span>, <span class="nm">10</span>, <span class="nm">10</span>, <span class="nm">5</span>),
+            <span class="kw">new</span> <span class="tp">Item</span>(<span class="st">"BMW Vehicle"</span>, <span class="st">"45RFT90RV"</span>, <span class="nm">60</span>, <span class="nm">60</span>, <span class="nm">120</span>, <span class="nm">450</span>),
+            ... <span class="cm">// 13 items total</span>
+        ));
+    }
+}
+</pre>
+
+<table>
+  <tr><th>Annotation</th><th>What it does</th></tr>
+  <tr><td><code>@Component</code></td><td>Registers this class with Spring so it is managed and its lifecycle hooks run.</td></tr>
+  <tr><td><code>@PostConstruct</code></td><td>Runs this method once, after Spring has finished wiring everything together. At this point the database connection and JPA are fully ready.</td></tr>
+</table>
+
+
+<!-- 9 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">9</span> The Frontend: HTML, CSS, and JavaScript</h2>
+
+<p>
+  The entire user interface is three static files served from
+  <code>src/main/resources/static/</code>. The browser downloads them once and then
+  communicates with the server only through the REST API — no page reloads.
+</p>
+
+<h3>index.html — Structure</h3>
+<p>
+  The HTML defines the skeleton: a header, a three-column workspace, a status bar,
+  and a details table. Every interactive element has an <code>id</code> so JavaScript
+  can find and update it.
+</p>
+<pre>
+<span class="cm">&lt;!-- Three-column workspace --&gt;</span>
+&lt;<span class="kw">div</span> class=<span class="st">"workspace"</span>&gt;
+  &lt;<span class="kw">div</span> class=<span class="st">"panel"</span>&gt;
+    &lt;<span class="kw">ul</span> id=<span class="st">"available-list"</span>&gt;&lt;/<span class="kw">ul</span>&gt;          <span class="cm">&lt;!-- JS writes item rows here --&gt;</span>
+  &lt;/<span class="kw">div</span>&gt;
+  &lt;<span class="kw">div</span> class=<span class="st">"controls"</span>&gt;
+    &lt;<span class="kw">select</span> id=<span class="st">"container-select"</span>&gt;...&lt;/<span class="kw">select</span>&gt;
+    &lt;<span class="kw">button</span> id=<span class="st">"add-btn"</span>&gt;Add &gt;&gt;&lt;/<span class="kw">button</span>&gt;
+    &lt;<span class="kw">button</span> id=<span class="st">"remove-btn"</span>&gt;&lt;&lt; Remove&lt;/<span class="kw">button</span>&gt;
+  &lt;/<span class="kw">div</span>&gt;
+  &lt;<span class="kw">div</span> class=<span class="st">"panel"</span>&gt;
+    &lt;<span class="kw">ul</span> id=<span class="st">"container-list"</span>&gt;&lt;/<span class="kw">ul</span>&gt;       <span class="cm">&lt;!-- JS writes container rows here --&gt;</span>
+  &lt;/<span class="kw">div</span>&gt;
+&lt;/<span class="kw">div</span>&gt;
+</pre>
+
+<h3>style.css — Layout</h3>
+<p>
+  Two modern CSS techniques handle the layout:
+</p>
+<ul>
+  <li><strong>CSS Grid</strong> (<code>grid-template-columns: 1fr 190px 1fr</code>) creates the three-column workspace. The center column has a fixed width; the two panels share remaining space equally.</li>
+  <li><strong>Flexbox</strong> (<code>display: flex; flex-direction: column</code>) stacks the controls vertically in the center panel.</li>
+</ul>
+<pre>
+.workspace {
+  <span class="kw">display</span>: grid;
+  <span class="kw">grid-template-columns</span>: 1fr 190px 1fr;  <span class="cm">/* left | center | right */</span>
+  <span class="kw">gap</span>: 16px;
+}
+</pre>
+
+<h3>app.js — The Fetch API</h3>
+<p>
+  JavaScript's <strong>Fetch API</strong> sends HTTP requests to the Spring Boot
+  server and reads the JSON responses. Using <code>async/await</code> keeps the code
+  readable despite the asynchronous nature of network calls.
+</p>
+<pre>
+<span class="kw">async function</span> <span class="mt">addItem</span>() {
+    <span class="kw">const</span> name = <span class="mt">encodeURIComponent</span>(currentContainer); <span class="cm">// "Container 1" → "Container%201"</span>
+    <span class="kw">const</span> res  = <span class="kw">await</span> <span class="mt">fetch</span>(`/api/containers/${name}/items/${selectedAvailId}`, {
+        method: <span class="st">'POST'</span>
+    });
+    <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="mt">json</span>();           <span class="cm">// parse JSON response</span>
+    <span class="mt">setStatus</span>(data.message, data.success ? <span class="st">'success'</span> : <span class="st">'error'</span>);
+    <span class="kw">if</span> (data.success) <span class="kw">await</span> <span class="mt">refreshAll</span>();   <span class="cm">// re-fetch and re-render both lists</span>
+}
+</pre>
+
+<h3>State and Re-rendering</h3>
+<p>
+  The JavaScript keeps three pieces of state:
+</p>
+<ul>
+  <li><code>availableItems</code> — the array last fetched from <code>/api/items/available</code></li>
+  <li><code>containerMap</code> — a map of container name → contents, fetched from <code>/api/containers</code></li>
+  <li><code>selectedAvailId</code> / <code>selectedContId</code> — which item is highlighted in each list</li>
+</ul>
+<p>
+  Every add or remove calls <code>refreshAll()</code>, which re-fetches both endpoints
+  in parallel using <code>Promise.all()</code> and then re-renders every panel. This
+  keeps the UI in sync with the database without a page reload.
+</p>
+<pre>
+<span class="kw">async function</span> <span class="mt">refreshAll</span>() {
+    <span class="kw">const</span> [itemsRes, containersRes] = <span class="kw">await</span> <span class="tp">Promise</span>.<span class="mt">all</span>([
+        <span class="mt">fetch</span>(<span class="st">'/api/items/available'</span>),
+        <span class="mt">fetch</span>(<span class="st">'/api/containers'</span>)
+    ]);
+    availableItems = <span class="kw">await</span> itemsRes.<span class="mt">json</span>();
+    <span class="kw">const</span> list     = <span class="kw">await</span> containersRes.<span class="mt">json</span>();
+    containerMap = {};
+    list.<span class="mt">forEach</span>(c =&gt; containerMap[c.name] = c);
+    <span class="mt">renderAvailablePanel</span>();
+    <span class="mt">renderContainerPanel</span>();
+    <span class="mt">renderDetailsTable</span>();
+}
+</pre>
+
+
+<!-- 10 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">10</span> How a Request Travels Through the App</h2>
+
+<p>Tracing an "Add Item" click from the browser to the database and back:</p>
+
+<div class="diagram">
+Browser (app.js)
+  │
+  │  User clicks "Add >>"
+  │  selectedAvailId = 3  (Honda Vehicle)
+  │  currentContainer = "Container 2"
+  │
+  │  fetch('POST /api/containers/Container%202/items/3')
+  │
+  ▼
+Spring Boot — ShipController
+  │
+  │  @PostMapping("/containers/{name}/items/{itemId}")
+  │  name    = "Container 2"   (Spring decodes %20 → space)
+  │  itemId  = 3
+  │
+  │  calls shipService.addToContainer(3, "Container 2")
+  │
+  ▼
+ShipService
+  │
+  │  itemRepository.findById(3)         → loads Honda Vehicle from SQLite
+  │  itemRepository.findByContainerName("Container 2")  → gets current contents
+  │  finds first null slot (slot 0)
+  │  item.setContainerName("Container 2")
+  │  item.setSlotIndex(0)
+  │  itemRepository.save(item)          → writes UPDATE to SQLite
+  │  returns true
+  │
+  ▼
+ShipController
+  │
+  │  ResponseEntity.ok(new ApiResponse(true, "Added to Container 2."))
+  │  Jackson converts to JSON: { "success": true, "message": "Added to Container 2." }
+  │
+  ▼
+Browser (app.js)
+  │
+  │  data.success === true
+  │  setStatus("Added to Container 2.", "success")
+  │  refreshAll() → two parallel fetches → re-render both lists
+  │
+  ▼
+User sees Honda Vehicle move from left list to right list.
+</div>
+
+
+<!-- 11 -->
+<div class="page-break"></div>
+<h2><span class="sec-num">11</span> Key Concepts Explained</h2>
+
+<h3>Dependency Injection</h3>
+<p>
+  Instead of creating objects with <code>new</code>, Spring creates them and
+  injects them where needed. <code>@Autowired</code> is the signal: "Spring, please
+  give me an instance of this." This means the controller never needs to know
+  how to create a <code>ShipService</code> — Spring handles it.
+</p>
+
+<h3>Layers and Why They Are Separated</h3>
+<table>
+  <tr><th>Layer</th><th>Knows about</th><th>Does not know about</th></tr>
+  <tr><td>Controller</td><td>HTTP, URLs, JSON</td><td>SQL, business rules</td></tr>
+  <tr><td>Service</td><td>Business rules, entities</td><td>HTTP, HTML</td></tr>
+  <tr><td>Repository</td><td>Database queries</td><td>HTTP, business rules</td></tr>
+</table>
+<p>
+  This separation means you could swap SQLite for PostgreSQL by changing only the
+  configuration — the controller and service code would not change at all.
+</p>
+
+<h3>async / await in JavaScript</h3>
+<p>
+  Network calls take time. JavaScript is single-threaded, so blocking while waiting
+  would freeze the browser. <code>async</code>/<code>await</code> lets you write code
+  that looks synchronous but does not block — the browser remains responsive while
+  waiting for the server to respond.
+</p>
+
+<h3>encodeURIComponent</h3>
+<p>
+  URLs cannot contain spaces. "Container 1" becomes "Container%201" when encoded.
+  Spring Boot decodes it back to "Container 1" automatically when binding the
+  <code>@PathVariable</code>. Always encode dynamic values before putting them in a URL.
+</p>
+
+<h3>Promise.all</h3>
+<p>
+  <code>Promise.all([fetchA, fetchB])</code> fires both HTTP requests at the same
+  time and waits for both to complete before continuing. This halves the wait time
+  compared to calling them one after the other.
+</p>
+
+<h3>Why Persistence Matters</h3>
+<p>
+  The desktop app lost all cargo state when it closed. With SQLite, the state is
+  written to disk on every save. Restarting the server, closing the browser, or
+  rebooting the machine — the containers still hold the same cargo because it is
+  stored in <code>shipping.db</code>, not in memory.
+</p>
+
+<div class="card tip">
+  <div class="card-title">What to build next</div>
+  <ul style="margin-top:6px;">
+    <li><strong>Add new items via the UI</strong> — a form that POSTs to a new <code>/api/items</code> endpoint, inserting a new row into SQLite.</li>
+    <li><strong>Delete items</strong> — a DELETE endpoint and a trash button in the UI.</li>
+    <li><strong>User accounts</strong> — Spring Security can protect the API with a login page.</li>
+    <li><strong>Deploy it</strong> — run <code>mvn package</code> to produce a self-contained JAR, then deploy to any server with Java installed.</li>
+  </ul>
+</div>
+
+<div style="margin-top:48px;padding-top:16px;border-top:1px solid #e0e7ef;font-size:9pt;color:#888;text-align:center;">
+  Shipping Container Web App &nbsp;·&nbsp; Spring Boot 3 &nbsp;·&nbsp; SQLite &nbsp;·&nbsp; Built with IntelliJ IDEA
+</div>
+
+</body>
+</html>

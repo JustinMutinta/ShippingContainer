@@ -1,0 +1,8 @@
+com\shipping\model\ApiResponse.class
+com\shipping\ShippingApplication.class
+com\shipping\controller\ShipController.class
+com\shipping\service\ShipService.class
+com\shipping\model\ContainerInfo.class
+com\shipping\DataInitializer.class
+com\shipping\model\Item.class
+com\shipping\repository\ItemRepository.class
